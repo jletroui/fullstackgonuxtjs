@@ -1,0 +1,12 @@
+{
+  "_public_key": "37fb52ff5f2de5d8cc845d862c21aa4124e54e184e287f144317006b06d7c07c",
+
+  "_port": 8080,
+  "_postgresWaitTimeoutMs": 10000,
+  "_postgresHost": "fake_postgres_svc",
+  "_postgresDatabase": "backend",
+  "_postgresAdminUser": "postgres",
+  "postgresAdminPassword": "EJ[1:yd6L4puuOtjzE5P6C+wDFUpWsCfToBVYaW7Font/TzI=:siq8WrDBRM7mbaXS+5SChZisqhypLwap:GJ0qX4gOIley0FIb/yL1XSE3KooEM8wwvOM=]",
+  "_postgresAppUser": "backend",
+  "postgresAppPassword": "EJ[1:yd6L4puuOtjzE5P6C+wDFUpWsCfToBVYaW7Font/TzI=:/BkIah8K4EAX1Ttj2vwS1y4j/iyrtr2A:csdrb/lYDQlg+sFJUw2EFc43xYz5JBh2kRcn]"
+}

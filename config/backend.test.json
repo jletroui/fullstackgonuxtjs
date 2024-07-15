@@ -1,0 +1,10 @@
+{
+  "_port": 8081,
+  "_postgresWaitTimeoutMs": 0,
+  "_postgresHost": "localhost",
+  "_postgresDatabase": "backend_test",
+  "_postgresAdminUser": "postgres",
+  "postgresAdminPassword": "secret",
+  "_postgresAppUser": "backend",
+  "postgresAppPassword": "backend"
+}

@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+display_usage() {
+    echo -e "Usage: ./dev <command>"
+    echo -e ""
+    echo -e "Available commands:"
+    echo -e "  backend:run                                install necessary environment for Python (provided pyenv is already installed)."
+
+}
+
+backend_run(){
+}
+
+case ${1:-} in
+    backend:run)
+        backend_run
+    ;;
+    *)
+        display_usage
+    ;;
+esac
