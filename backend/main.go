@@ -9,13 +9,18 @@ import (
 )
 
 func main() {
-	cfg, err := config.LoadFromEnv("dev")
+	cfg, err := config.LoadConfigFromEnv("dev")
 	if err != nil {
 		log.Fatalf("Cannot load config: %s", err)
 	}
 
-	err = config.RunServer(cfg, func(svr *gin.RouterGroup) {
-		web.InstallTaskRoutes(svr)
+	err = config.MigrateDatabase(cfg)
+	if err != nil {
+		log.Fatalf("Cannot migrate database %s @%s: %s", cfg.PostgresDatabase, cfg.PostgresHost, err)
+	}
+
+	err = config.RunServer(cfg, func(apiRoutes *gin.RouterGroup) {
+		web.InstallTaskRoutes(apiRoutes)
 	})
 
 	if err != nil {

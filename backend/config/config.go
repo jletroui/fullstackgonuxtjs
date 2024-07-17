@@ -24,7 +24,7 @@ var encryptedConfigEnvs = map[string]struct{}{
 	"staging":    {},
 }
 
-func LoadFromEnv(defaultEnv string) (*Config, error) {
+func LoadConfigFromEnv(defaultEnv string) (*Config, error) {
 	env, envExists := os.LookupEnv("ENV")
 	if !envExists {
 		env = defaultEnv
