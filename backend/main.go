@@ -4,6 +4,7 @@ import (
 	"backend/config"
 	"backend/logic"
 	"backend/web"
+	"fmt"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -26,10 +27,11 @@ func main() {
 
 	taskRepo := logic.NewPostgresTaskRepository(db)
 
-	err = config.RunServer(cfg, func(apiRoutes *gin.RouterGroup) {
+	svr := config.CreateRouter(cfg, func(apiRoutes *gin.RouterGroup) {
 		web.InstallTaskRoutes(apiRoutes, taskRepo)
 	})
 
+	err = svr.Run(fmt.Sprintf("0.0.0.0:%d", cfg.Port))
 	if err != nil {
 		log.Fatalf("Cannot start server at port %d: %s", cfg.Port, err)
 	}

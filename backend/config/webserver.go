@@ -1,22 +1,21 @@
 package config
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 )
 
-func RunServer(config *Config, installApiRoutes func(*gin.RouterGroup)) error {
-	svr := gin.Default()
+func CreateRouter(cfg *Config, installApiRoutes func(*gin.RouterGroup)) *gin.Engine {
+	router := gin.Default()
 
-	apiRoutes := svr.Group("/api")
+	apiRoutes := router.Group("/api")
 	installApiRoutes(apiRoutes)
 
-	svr.Use(createStaticHandler())
+	router.Use(createStaticHandler())
 
-	return svr.Run(fmt.Sprintf("0.0.0.0:%d", config.Port))
+	return router
 }
 
 func createStaticHandler() gin.HandlerFunc {

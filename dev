@@ -41,8 +41,8 @@ setup() {
     echo ""
     echo "To finalize the setup:"
     echo ""
-    echo '1) add go to your PATH in your ~/.profile:'
-    echo 'PATH="/usr/lib/go-1.22/bin:$PATH"'
+    echo '1) add go and GOPATH binaries to your PATH in your ~/.profile:'
+    echo 'PATH="/usr/lib/go-1.22/bin:$HOME/go/bin:$PATH"'
     echo ""
     echo '2) install Docker Desktop if not done. On Windows / WSL, use Chocolatey to do so. On pure Debian, use apt.'
 }
