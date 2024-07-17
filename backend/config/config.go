@@ -17,9 +17,11 @@ type Config struct {
 	PostgresAdminPassword string `json:"postgresAdminPassword"`
 	PostgresAppUser       string `json:"_postgresAppUser"`
 	PostgresAppPassword   string `json:"postgresAppPassword"`
+	BasePath              string
 }
 
-var encryptedConfigEnvs = map[string]struct{}{
+// When deployed, the config is encrypted
+var deployedEnvs = map[string]struct{}{
 	"production": {},
 	"staging":    {},
 }
@@ -29,18 +31,17 @@ func LoadConfigFromEnv(defaultEnv string) (*Config, error) {
 	if !envExists {
 		env = defaultEnv
 	}
-	_, isEncrypted := encryptedConfigEnvs[env]
+	basePath := basePath(env)
+	_, isDeployed := deployedEnvs[env]
 	var data []byte
 	var err error
-	if isEncrypted {
-		var configFilePath = fmt.Sprintf("config/backend.%s.ejson", env)
-		data, err = ejson.DecryptFile(configFilePath, "/opt/ejson/keys", "")
+	if isDeployed {
+		data, err = ejson.DecryptFile(fmt.Sprintf("%sconfig/backend.%s.ejson", basePath, env), "/opt/ejson/keys", "")
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		var configFilePath = fmt.Sprintf("config/backend.%s.json", env)
-		data, err = os.ReadFile(configFilePath)
+		data, err = os.ReadFile(fmt.Sprintf("%sconfig/backend.%s.json", basePath, env))
 		if err != nil {
 			return nil, err
 		}
@@ -49,7 +50,23 @@ func LoadConfigFromEnv(defaultEnv string) (*Config, error) {
 	err = json.Unmarshal(data, res)
 	if err != nil {
 		return nil, err
-	} else {
-		return res, nil
+	}
+	res.BasePath = basePath
+	return res, nil
+}
+
+func basePath(env string) string {
+	// This is a bit of logic allowing to execute from the project root or from within backend/.
+	// Useful to not have to fiddle with config when executing tests, debugging the project, etc...
+	switch env {
+	case "dev":
+		return "../" // Running app in dev, we are in backend/
+	case "test", "ci":
+		// This is britle but sufficient. A stronger (but over engineered) technique would be to search recursively in each parent directory.
+		return "../../" // Running tests, we are in backend/somepackage
+	case "production", "staging":
+		return ""
+	default:
+		panic(fmt.Sprintf("Don't know env '%s'.", env))
 	}
 }

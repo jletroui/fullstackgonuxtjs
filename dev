@@ -11,6 +11,7 @@ display_usage() {
     echo -e "  db:stop                                    stops the backend dev database."
     echo -e "  db:console                                 opens the backend dev database psql console."
     echo -e "  db:create-migration NAME                   creates a new migration script for the backend database with name NAME."
+    echo -e "  backend:test                               runs backend tests."
 }
 
 setup() {
@@ -62,6 +63,10 @@ db_create-migration() {
     migrate create -dir ops/db/migrations -format 20060102150405 -ext sql $1
 }
 
+backend_test() {
+    (cd backend && go test -v ./...)
+}
+
 case "${1:-}" in
     setup)
         setup
@@ -77,6 +82,9 @@ case "${1:-}" in
     ;;
     db:create-migration)
         db_create-migration $2
+    ;;
+    backend:test)
+        backend_test
     ;;
     *)
         display_usage

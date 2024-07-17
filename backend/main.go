@@ -2,6 +2,7 @@ package main
 
 import (
 	"backend/config"
+	"backend/logic"
 	"backend/web"
 	"log"
 
@@ -18,9 +19,15 @@ func main() {
 	if err != nil {
 		log.Fatalf("Cannot migrate database %s @%s: %s", cfg.PostgresDatabase, cfg.PostgresHost, err)
 	}
+	db, err := config.NewDatabase(cfg)
+	if err != nil {
+		log.Fatalf("Cannot connect to database %s @%s: %s", cfg.PostgresDatabase, cfg.PostgresHost, err)
+	}
+
+	taskRepo := logic.NewPostgresTaskRepository(db)
 
 	err = config.RunServer(cfg, func(apiRoutes *gin.RouterGroup) {
-		web.InstallTaskRoutes(apiRoutes)
+		web.InstallTaskRoutes(apiRoutes, taskRepo)
 	})
 
 	if err != nil {
