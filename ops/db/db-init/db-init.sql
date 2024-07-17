@@ -1,0 +1,5 @@
+CREATE USER backend WITH PASSWORD 'backend';
+CREATE DATABASE backend;
+GRANT ALL PRIVILEGES ON DATABASE backend TO backend;
+CREATE DATABASE backend_test;
+GRANT ALL PRIVILEGES ON DATABASE backend_test TO backend;

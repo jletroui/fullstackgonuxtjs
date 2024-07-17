@@ -1,0 +1,13 @@
+# Services necessary for local dev
+
+services:
+  postgres_svc:
+    container_name: go_postgres_ctnr
+    image: postgres:12-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secret
+    ports:
+        - "5432:5432"
+    volumes:
+      - ./db/db-init:/docker-entrypoint-initdb.d

@@ -7,7 +7,9 @@ display_usage() {
     echo -e ""
     echo -e "Available commands:"
     echo -e "  setup                                      install necessary environment for developing with this project on Debian."
-    echo -e "  backend:run                                install necessary environment for Python (provided pyenv is already installed)."
+    echo -e "  db:start                                   starts the backend dev database."
+    echo -e "  db:stop                                    stops the backend dev database."
+    echo -e "  db:console                                 opens the backend dev database psql console."
     echo -e "  db:create-migration NAME                   creates a new migration script for the backend database with name NAME."
 }
 
@@ -20,18 +22,40 @@ setup() {
         curl -fsSL "https://packagecloud.io/golang-migrate/migrate/gpgkey" | sudo gpg --dearmor -o /etc/apt/keyrings/migrate.gpg
         echo "deb [signed-by=/etc/apt/keyrings/migrate.gpg] https://packagecloud.io/golang-migrate/migrate/debian/ $(lsb_release -sc 2>/dev/null) main" | sudo tee /etc/apt/sources.list.d/migrate.list > /dev/null
     fi
+    if ! command -v ejson -v &> /dev/null; then
+        TEMP_DEB="$(mktemp --suffix=.deb)"
+        wget -O "$TEMP_DEB" 'https://github.com/Shopify/ejson/releases/download/v1.5.2/ejson_1.5.2_linux_amd64.deb'
+        sudo apt install -y -f "$TEMP_DEB"
+        rm -f "$TEMP_DEB"
+    fi
 
     # installs the rest
     sudo apt-get update
     sudo apt install -y golang-1.22 migrate
 
+    # this hook is making sure we are not commiting unencrypted secrets
+    mkdir -p ./.git/hooks
+    cp ./ops/git/hooks/pre-commit ./.git/hooks/
+
     echo ""
-    echo "To finalize the setup, add go to your PATH in your ~/.profile:"
+    echo "To finalize the setup:"
+    echo ""
+    echo '1) add go to your PATH in your ~/.profile:'
     echo 'PATH="/usr/lib/go-1.22/bin:$PATH"'
+    echo ""
+    echo '2) install Docker Desktop if not done. On Windows / WSL, use Chocolatey to do so. On pure Debian, use apt.'
 }
 
-backend_run() {
-    echo "run"
+db_start() {
+    docker-compose -f ops/docker-compose.dev.yml up --detach --no-recreate --remove-orphans
+}
+
+db_stop() {
+    docker-compose -f ops/docker-compose.dev.yml down
+}
+
+db_console() {
+    docker exec -it go_postgres_ctnr psql -U postgres
 }
 
 db_create-migration() {
@@ -42,8 +66,14 @@ case "${1:-}" in
     setup)
         setup
     ;;
-    backend:run)
-        backend_run
+    db:start)
+        db_start
+    ;;
+    db:stop)
+        db_stop
+    ;;
+    db:console)
+        db_console
     ;;
     db:create-migration)
         db_create-migration $2
