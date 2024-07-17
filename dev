@@ -6,16 +6,47 @@ display_usage() {
     echo -e "Usage: ./dev <command>"
     echo -e ""
     echo -e "Available commands:"
+    echo -e "  setup                                      install necessary environment for developing with this project on Debian."
     echo -e "  backend:run                                install necessary environment for Python (provided pyenv is already installed)."
-
+    echo -e "  db:create-migration NAME                   creates a new migration script for the backend database with name NAME."
 }
 
-backend_run(){
+setup() {
+    # adds go migrate repo: https://github.com/golang-migrate/migrate/tree/master/cmd/migrate
+    if sudo test ! -e "/etc/apt/sources.list.d/migrate.list"; then
+        sudo apt-get update
+        sudo apt install -y lsb-release    
+        sudo mkdir -m 0755 -p /etc/apt/keyrings/
+        curl -fsSL "https://packagecloud.io/golang-migrate/migrate/gpgkey" | sudo gpg --dearmor -o /etc/apt/keyrings/migrate.gpg
+        echo "deb [signed-by=/etc/apt/keyrings/migrate.gpg] https://packagecloud.io/golang-migrate/migrate/debian/ $(lsb_release -sc 2>/dev/null) main" | sudo tee /etc/apt/sources.list.d/migrate.list > /dev/null
+    fi
+
+    # installs the rest
+    sudo apt-get update
+    sudo apt install -y golang-1.22 migrate
+
+    echo ""
+    echo "To finalize the setup, add go to your PATH in your ~/.profile:"
+    echo 'PATH="/usr/lib/go-1.22/bin:$PATH"'
 }
 
-case ${1:-} in
+backend_run() {
+    echo "run"
+}
+
+db_create-migration() {
+    migrate create -dir ops/db/migrations -format 20060102150405 -ext sql $1
+}
+
+case "${1:-}" in
+    setup)
+        setup
+    ;;
     backend:run)
         backend_run
+    ;;
+    db:create-migration)
+        db_create-migration $2
     ;;
     *)
         display_usage
