@@ -20,6 +20,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Cannot migrate database %s @%s: %s", cfg.PostgresDatabase, cfg.PostgresHost, err)
 	}
+
 	db, err := config.NewDatabase(cfg)
 	if err != nil {
 		log.Fatalf("Cannot connect to database %s @%s: %s", cfg.PostgresDatabase, cfg.PostgresHost, err)

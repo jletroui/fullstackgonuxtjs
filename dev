@@ -11,6 +11,8 @@ display_usage() {
     echo -e "  db:stop                                    stops the backend dev database."
     echo -e "  db:console                                 opens the backend dev database psql console."
     echo -e "  db:create-migration NAME                   creates a new migration script for the backend database with name NAME."
+    echo -e "  backend:check                              runs backend lint and test."
+    echo -e "  backend:lint                               runs backend lint."
     echo -e "  backend:test                               runs backend tests."
 }
 
@@ -23,6 +25,7 @@ setup() {
         curl -fsSL "https://packagecloud.io/golang-migrate/migrate/gpgkey" | sudo gpg --dearmor -o /etc/apt/keyrings/migrate.gpg
         echo "deb [signed-by=/etc/apt/keyrings/migrate.gpg] https://packagecloud.io/golang-migrate/migrate/debian/ $(lsb_release -sc 2>/dev/null) main" | sudo tee /etc/apt/sources.list.d/migrate.list > /dev/null
     fi
+    # ejson
     if ! command -v ejson -v &> /dev/null; then
         TEMP_DEB="$(mktemp --suffix=.deb)"
         wget -O "$TEMP_DEB" 'https://github.com/Shopify/ejson/releases/download/v1.5.2/ejson_1.5.2_linux_amd64.deb'
@@ -34,6 +37,11 @@ setup() {
     sudo apt-get update
     sudo apt install -y golang-1.22 migrate
 
+    # golangci-lint
+    if ! command -v golangci-lint --version &> /dev/null; then
+        curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.59.1
+    fi
+
     # this hook is making sure we are not commiting unencrypted secrets
     mkdir -p ./.git/hooks
     cp ./ops/git/hooks/pre-commit ./.git/hooks/
@@ -42,7 +50,8 @@ setup() {
     echo "To finalize the setup:"
     echo ""
     echo '1) add go and GOPATH binaries to your PATH in your ~/.profile:'
-    echo 'PATH="/usr/lib/go-1.22/bin:$HOME/go/bin:$PATH"'
+    echo 'PATH="/usr/lib/go-1.22/bin:$PATH"'
+    echo 'PATH="$(go env GOPATH)/bin:$PATH"'
     echo ""
     echo '2) install Docker Desktop if not done. On Windows / WSL, use Chocolatey to do so. On pure Debian, use apt.'
 }
@@ -61,6 +70,10 @@ db_console() {
 
 db_create-migration() {
     migrate create -dir ops/db/migrations -format 20060102150405 -ext sql $1
+}
+
+backend_lint() {
+    (cd backend && golangci-lint run)
 }
 
 backend_test() {
@@ -82,6 +95,12 @@ case "${1:-}" in
     ;;
     db:create-migration)
         db_create-migration $2
+    ;;
+    backend:check)
+        backend_lint; backend_test
+    ;;
+    backend:lint)
+        backend_lint
     ;;
     backend:test)
         backend_test
