@@ -73,11 +73,11 @@ db_create-migration() {
 }
 
 backend_lint() {
-    (cd backend && golangci-lint run)
+    (cd backend && echo "Linting..." && golangci-lint run --show-stats)
 }
 
 backend_test() {
-    (cd backend && go test -v ./...)
+    (cd backend && echo "Testing..." && go test -v ./...)
 }
 
 case "${1:-}" in

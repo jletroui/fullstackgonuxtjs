@@ -26,7 +26,7 @@ func TestTaskRoutes(t *testing.T) {
 
 func (suite *TaskRoutesTestSuite) SetupSuite() {
 	suite.tasksRepository = mocks.NewTaskRepository(suite.T())
-	suite.router = config.CreateRouter(Cfg, func(apiRoutes *gin.RouterGroup) {
+	suite.router = config.CreateWebServer(Cfg, func(apiRoutes *gin.RouterGroup) {
 		web.InstallTaskRoutes(apiRoutes, suite.tasksRepository)
 	})
 }

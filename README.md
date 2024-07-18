@@ -11,11 +11,11 @@ Supports:
 - configuration and secrets
 - backend unit tests for the example data access layer, controller, and page
 - backend linting
+- structured logging
 
 TODO:
 - frontend linting
 - frontend unit tests for the example data access layer, controller, and page
-- structured logging
 - deployment (production simulated locally)
 - frontend and backend CI
 
@@ -34,10 +34,10 @@ What we forgo when choosing one or the other:
 
 Cons of Kotlin:
 - less simple
-- smaller pool of programmers with experience on it (although very close to Java)
-- more integration work for auth tools like Ory Kratos or SuperTokens
+- smaller pool of programmers with experience on it (although very close to Java, so Java developer would adapt quickly)
+- more integration work for authentication solutions like Ory Kratos or SuperTokens
 
 Cons of Go:
 - less expressive
 - less constructs available to avoid technical bugs (immutability, nullability, etc...)
-- no mature build tool as turn key, simple, and powerful as JVM build tools (Gradle, ...)
+- no mature build tool as powerful as JVM build tools (Gradle, ...)

@@ -5,35 +5,43 @@ import (
 	"backend/logic"
 	"backend/web"
 	"fmt"
-	"log"
+	"log/slog"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	config.ConfigureLogging()
+
 	cfg, err := config.LoadConfigFromEnv("dev")
 	if err != nil {
-		log.Fatalf("Cannot load config: %s", err)
+		fatal(err, "Cannot load config")
 	}
 
 	err = config.MigrateDatabase(cfg)
 	if err != nil {
-		log.Fatalf("Cannot migrate database %s @%s: %s", cfg.PostgresDatabase, cfg.PostgresHost, err)
+		fatal(err, "Cannot migrate database %s @%s", cfg.PostgresDatabase, cfg.PostgresHost)
 	}
 
 	db, err := config.NewDatabase(cfg)
 	if err != nil {
-		log.Fatalf("Cannot connect to database %s @%s: %s", cfg.PostgresDatabase, cfg.PostgresHost, err)
+		fatal(err, "Cannot connect to database %s @%s", cfg.PostgresDatabase, cfg.PostgresHost)
 	}
 
 	taskRepo := logic.NewPostgresTaskRepository(db)
 
-	svr := config.CreateRouter(cfg, func(apiRoutes *gin.RouterGroup) {
+	svr := config.CreateWebServer(cfg, func(apiRoutes *gin.RouterGroup) {
 		web.InstallTaskRoutes(apiRoutes, taskRepo)
 	})
 
 	err = svr.Run(fmt.Sprintf("0.0.0.0:%d", cfg.Port))
 	if err != nil {
-		log.Fatalf("Cannot start server at port %d: %s", cfg.Port, err)
+		fatal(err, "Cannot start server at port %d", cfg.Port)
 	}
+}
+
+func fatal(err error, msgTemplate string, args ...any) {
+	slog.Error(fmt.Sprintf(msgTemplate, args...), "error", err)
+	os.Exit(1)
 }
