@@ -2,6 +2,9 @@
 
 set -eu -o pipefail
 
+NODE_MAJOR_VERSION=20
+export NVM_DIR="$HOME/.nvm"
+
 display_usage() {
     echo -e "Usage: ./dev <command>"
     echo -e ""
@@ -11,35 +14,67 @@ display_usage() {
     echo -e "  db:stop                                    stops the backend dev database."
     echo -e "  db:console                                 opens the backend dev database psql console."
     echo -e "  db:create-migration NAME                   creates a new migration script for the backend database with name NAME."
-    echo -e "  backend:check                              runs backend lint and test."
-    echo -e "  backend:lint                               runs backend lint."
-    echo -e "  backend:test                               runs backend tests."
+    echo -e "  back:check                                 runs backend lint and test."
+    echo -e "  back:lint                                  runs backend lint."
+    echo -e "  back:test                                  runs backend tests."
+    echo -e "  front:install                              install frontend dependencies."
+    echo -e "  front:run                                  starts frontend development server."
+    echo -e "  front:check                                runs frontend lint and test."
+    echo -e "  front:lint                                 runs frontend lint."
+    echo -e "  front:test                                 runs frontend tests."
 }
 
 setup() {
     # adds go migrate repo: https://github.com/golang-migrate/migrate/tree/master/cmd/migrate
     if sudo test ! -e "/etc/apt/sources.list.d/migrate.list"; then
-        sudo apt-get update
-        sudo apt install -y lsb-release    
-        sudo mkdir -m 0755 -p /etc/apt/keyrings/
+        echo "[SETUP] golang-migrate not found. Installing."
+        sudo sudo apt-get update
+        sudo sudo apt install -y lsb-release    
+        sudo sudo mkdir -m 0755 -p /etc/apt/keyrings/
         curl -fsSL "https://packagecloud.io/golang-migrate/migrate/gpgkey" | sudo gpg --dearmor -o /etc/apt/keyrings/migrate.gpg
         echo "deb [signed-by=/etc/apt/keyrings/migrate.gpg] https://packagecloud.io/golang-migrate/migrate/debian/ $(lsb_release -sc 2>/dev/null) main" | sudo tee /etc/apt/sources.list.d/migrate.list > /dev/null
+    else
+        echo "[SETUP] golang-migrate already installed, skipping."
     fi
     # ejson
     if ! command -v ejson -v &> /dev/null; then
+        echo "[SETUP] ejson not found. Installing."
         TEMP_DEB="$(mktemp --suffix=.deb)"
         wget -O "$TEMP_DEB" 'https://github.com/Shopify/ejson/releases/download/v1.5.2/ejson_1.5.2_linux_amd64.deb'
         sudo apt install -y -f "$TEMP_DEB"
         rm -f "$TEMP_DEB"
+    else
+        echo "[SETUP] ejson already installed, skipping."
     fi
 
     # installs the rest
     sudo apt-get update
     sudo apt install -y golang-1.22 migrate
 
+    # nodejs
+    if ! [ -s "$NVM_DIR/nvm.sh" ]; then
+        echo "[SETUP] nvm not found. Installing."
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+        source ~/.bashrc
+    else
+        echo "[SETUP] nvm already installed, skipping."
+    fi
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+    if ! nvm ls ${NODE_MAJOR_VERSION} | grep -q "v20."; then
+        echo "[SETUP] Node JS v20 not found. Installing."
+        nvm install 20
+    else
+        echo "[SETUP] Node JS v20 already installed, skipping."
+    fi
+    nvm use 20
+
     # golangci-lint
     if ! command -v golangci-lint --version &> /dev/null; then
+        echo "[SETUP] golangci-lint not found. Installing."
         curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.59.1
+    else
+        echo "[SETUP] golangci-lint already installed, skipping."
     fi
 
     # this hook is making sure we are not commiting unencrypted secrets
@@ -47,7 +82,7 @@ setup() {
     cp ./ops/git/hooks/pre-commit ./.git/hooks/
 
     echo ""
-    echo "To finalize the setup:"
+    echo "[SETUP] To finalize the setup:"
     echo ""
     echo '1) add go and GOPATH binaries to your PATH in your ~/.profile:'
     echo 'PATH="/usr/lib/go-1.22/bin:$PATH"'
@@ -80,6 +115,22 @@ backend_test() {
     (cd backend && echo "Testing..." && go test -v ./...)
 }
 
+frontend_install() {
+    (cd frontend && npm install)
+}
+
+frontend_run() {
+    (cd frontend && npm run dev)
+}
+
+frontend_lint() {
+    (cd frontend && echo "Linting..." && echo "TODO")
+}
+
+frontend_test() {
+    (cd frontend && echo "Testing..." && echo "TODO")
+}
+
 case "${1:-}" in
     setup)
         setup
@@ -96,14 +147,29 @@ case "${1:-}" in
     db:create-migration)
         db_create-migration $2
     ;;
-    backend:check)
+    back:check)
         backend_lint; backend_test
     ;;
-    backend:lint)
+    back:lint)
         backend_lint
     ;;
-    backend:test)
+    back:test)
         backend_test
+    ;;
+    front:install)
+        frontend_install
+    ;;
+    front:run)
+        frontend_run
+    ;;
+    front:check)
+        frontend_lint; frontend_test
+    ;;
+    front:lint)
+        frontend_lint
+    ;;
+    front:test)
+        frontend_test
     ;;
     *)
         display_usage
