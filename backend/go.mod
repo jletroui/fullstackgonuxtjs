@@ -8,6 +8,7 @@ require (
 )
 
 require (
+	github.com/gin-contrib/cors v1.7.2 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 )

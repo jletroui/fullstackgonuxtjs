@@ -5,17 +5,22 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 )
 
 func CreateWebServer(cfg *Config, installApiRoutes func(*gin.RouterGroup)) *gin.Engine {
 	gin.DefaultWriter = new(slogWriter)
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowOrigins = cfg.AllowOrigins
+
 	router := gin.New()
 	router.Use(
 		createStructuredAccessLog(),
 		createStaticHandler(),
 		gin.Recovery(),
+		cors.New(corsConfig),
 	)
 
 	apiRoutes := router.Group("/api")

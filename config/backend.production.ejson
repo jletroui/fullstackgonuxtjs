@@ -2,6 +2,7 @@
   "_public_key": "37fb52ff5f2de5d8cc845d862c21aa4124e54e184e287f144317006b06d7c07c",
 
   "_port": 8080,
+  "_allowOrigins": [],
   "_postgresWaitTimeoutMs": 10000,
   "_postgresHost": "fake_postgres_svc",
   "_postgresDatabase": "backend",

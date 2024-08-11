@@ -1,5 +1,6 @@
 {
   "_port": 8081,
+  "_allowOrigins": ["http://localhost:3000"],
   "_postgresWaitTimeoutMs": 0,
   "_postgresHost": "localhost",
   "_postgresDatabase": "backend_test",

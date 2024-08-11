@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if ! command -v ejson -v &> /dev/null; then
   echo "You must run './dev setup' to install (among other things) ejson"
@@ -15,7 +15,7 @@ for FILE in $FILES; do
   if [ "${FILE##*.}" = "ejson" ]; then
     # Encrypt the ejson file
     echo "${FILE} changed. Running ejson encryption on it."
-    ejson_output=$(ops/tools/ejson encrypt "${FILE}" 2>&1)
+    ejson_output=$(ejson encrypt "${FILE}" 2>&1)
 
     # check if ejson exit code is different from 0
     if [ $? -ne 0 ]; then

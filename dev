@@ -124,11 +124,11 @@ frontend_run() {
 }
 
 frontend_lint() {
-    (cd frontend && echo "Linting..." && echo "TODO")
+    (cd frontend && echo "Linting..." && npm run lint && npm run typecheck)
 }
 
 frontend_test() {
-    (cd frontend && echo "Testing..." && echo "TODO")
+    (cd frontend && echo "Testing..." && npm run test)
 }
 
 case "${1:-}" in

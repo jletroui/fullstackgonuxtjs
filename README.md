@@ -11,10 +11,10 @@ Supports:
 - configuration and secrets
 - backend unit tests for the example data access layer, controller, and page
 - backend linting
+- frontend linting
 - structured logging
 
 TODO:
-- frontend linting
 - frontend unit tests for the example data access layer, controller, and page
 - deployment (production simulated locally)
 - frontend and backend CI

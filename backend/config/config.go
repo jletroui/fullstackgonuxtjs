@@ -9,14 +9,15 @@ import (
 )
 
 type Config struct {
-	Port                  int    `json:"_port"`
-	PostgresWaitTimeoutMs int    `json:"_postgresWaitTimeoutMs"`
-	PostgresHost          string `json:"_postgresHost"`
-	PostgresDatabase      string `json:"_postgresDatabase"`
-	PostgresAdminUser     string `json:"_postgresAdminUser"`
-	PostgresAdminPassword string `json:"postgresAdminPassword"`
-	PostgresAppUser       string `json:"_postgresAppUser"`
-	PostgresAppPassword   string `json:"postgresAppPassword"`
+	Port                  int      `json:"_port"`
+	AllowOrigins          []string `json:"_allowOrigins"`
+	PostgresWaitTimeoutMs int      `json:"_postgresWaitTimeoutMs"`
+	PostgresHost          string   `json:"_postgresHost"`
+	PostgresDatabase      string   `json:"_postgresDatabase"`
+	PostgresAdminUser     string   `json:"_postgresAdminUser"`
+	PostgresAdminPassword string   `json:"postgresAdminPassword"`
+	PostgresAppUser       string   `json:"_postgresAppUser"`
+	PostgresAppPassword   string   `json:"postgresAppPassword"`
 	BasePath              string
 }
 
