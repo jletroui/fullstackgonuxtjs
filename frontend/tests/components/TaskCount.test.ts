@@ -1,15 +1,30 @@
-import { it, expect } from 'vitest'
+import { vi, it, expect, describe } from 'vitest'
 import { renderSuspended } from '@nuxt/test-utils/runtime'
 import { TaskCount } from '#components'
-import { screen } from '@testing-library/vue'
-import { registerEndpoint } from '@nuxt/test-utils/runtime'
+import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 
-it('can render TaskCount', async () => {
-  registerEndpoint('/tasks/count', {
-    method: 'GET',
-    handler: () => ({ count: 3 })
+const { useTaskCountQueryMock } = vi.hoisted(() => ({ useTaskCountQueryMock: vi.fn() }))
+mockNuxtImport('useTaskCountQuery', () => useTaskCountQueryMock)
+
+describe("TaskCount", () => {
+  it('can render TaskCount when query not completed yet', async () => {
+    useTaskCountQueryMock.mockImplementation(() => ({ status: 'pending', cnt: -1 }))
+
+    const component = await renderSuspended(TaskCount)
+    expect(component.getByTestId("TaskCount").textContent).toEqual('Loading...')
   })
 
-  const component = await renderSuspended(TaskCount)
-  expect(screen.getByText('3')).toBeDefined() // Fails for now.
+  it('can render TaskCount when query completed and is successful', async () => {
+    useTaskCountQueryMock.mockImplementation(() => ({ status: 'success', cnt: 3 }))
+
+    const component = await renderSuspended(TaskCount)
+    expect(component.getByTestId("TaskCount").textContent).toEqual('3')
+  })
+
+  it('can render TaskCount when query completed and has failed', async () => {
+    useTaskCountQueryMock.mockImplementation(() => ({ status: 'error', cnt: -1 }))
+
+    const component = await renderSuspended(TaskCount)
+    expect(component.getByTestId("TaskCount").textContent).toEqual('Error!')
+  })
 })
