@@ -41,3 +41,8 @@ Cons of Go:
 - less expressive
 - less constructs available to avoid technical bugs (immutability, nullability, etc...)
 - no mature build tool as powerful as JVM build tools (Gradle, ...)
+
+## Making it work with VSCode:
+
+1. Install the [Vue official extension](https://marketplace.visualstudio.com/items?itemName=Vue.volar).
+2. [Disable the built in Typescript extension](https://stackoverflow.com/questions/54839057/vscode-showing-cannot-find-module-ts-error-for-vue-import-while-compiling-doe/73710755#73710755).

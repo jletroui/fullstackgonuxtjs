@@ -7,6 +7,7 @@
     "dev": "nuxt dev",
     "typecheck": "nuxt typecheck",
     "lint": "eslint .",
+    "test": "vitest run",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
@@ -16,8 +17,14 @@
     "nuxt": "^3.12.4",
     "vue": "latest"
   },
+  "//": "Latest version of @nuxt/test-utils is 3.13.x, but there is a bug: https://github.com/nuxt/test-utils/issues/818. This is forcing us to use a seriously downgraded version, with vitest 1.x instead of 2.x.",
   "devDependencies": {
+    "@nuxt/test-utils": "~3.11.0",
+    "@testing-library/vue": "^8.1.0",
+    "@vue/test-utils": "^2.4.6",
+    "happy-dom": "^13.0.0",
     "typescript": "^5.5.4",
+    "vitest": "^1.0.0",
     "vue-tsc": "^2.0.29"
   }
 }
