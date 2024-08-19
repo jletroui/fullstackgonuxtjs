@@ -4,7 +4,7 @@
   "_port": 8080,
   "_allowOrigins": [],
   "_postgresWaitTimeoutMs": 10000,
-  "_postgresHost": "fake_postgres_svc",
+  "_postgresHost": "fake_go_postgres_svc",
   "_postgresDatabase": "backend",
   "_postgresAdminUser": "postgres",
   "postgresAdminPassword": "EJ[1:yd6L4puuOtjzE5P6C+wDFUpWsCfToBVYaW7Font/TzI=:siq8WrDBRM7mbaXS+5SChZisqhypLwap:GJ0qX4gOIley0FIb/yL1XSE3KooEM8wwvOM=]",

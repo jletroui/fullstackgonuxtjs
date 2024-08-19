@@ -13,9 +13,9 @@ Supports:
 - backend linting
 - frontend linting
 - structured logging
+- frontend unit tests for the example data access layer, controller, and page
 
 TODO:
-- frontend unit tests for the example data access layer, controller, and page
 - deployment (production simulated locally)
 - frontend and backend CI
 

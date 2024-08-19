@@ -1,0 +1,3 @@
+CREATE USER backend WITH PASSWORD 'backendprod';
+CREATE DATABASE backend;
+GRANT ALL PRIVILEGES ON DATABASE backend TO backend;

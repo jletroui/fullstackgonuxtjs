@@ -12,16 +12,19 @@ import (
 
 func CreateWebServer(cfg *Config, installApiRoutes func(*gin.RouterGroup)) *gin.Engine {
 	gin.DefaultWriter = new(slogWriter)
-	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowOrigins = cfg.AllowOrigins
 
 	router := gin.New()
 	router.Use(
 		createStructuredAccessLog(),
 		createStaticHandler(),
 		gin.Recovery(),
-		cors.New(corsConfig),
 	)
+
+	if len(cfg.AllowOrigins) > 0 {
+		corsConfig := cors.DefaultConfig()
+		corsConfig.AllowOrigins = cfg.AllowOrigins
+		router.Use(cors.New(corsConfig))
+	}
 
 	apiRoutes := router.Group("/api")
 	installApiRoutes(apiRoutes)

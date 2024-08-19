@@ -22,6 +22,10 @@ display_usage() {
     echo -e "  front:check                                runs frontend lint and test."
     echo -e "  front:lint                                 runs frontend lint."
     echo -e "  front:test                                 runs frontend tests."
+    echo -e "  simprod:start                              simulate build and deployment in a production env, locally."
+    echo -e "  simprod:stop                               stops simulated prod."
+    echo -e "  simprod:reset                              stops simulated prod and delete containers and their data."
+    echo -e "  simprod:logs                               display logs of simulated prod."
 }
 
 setup() {
@@ -131,6 +135,24 @@ frontend_test() {
     (cd frontend && echo "Testing..." && npm run test)
 }
 
+simprod_start() {
+    docker build --tag fullstackgonuxtjs . && \
+    docker-compose -f ./ops/docker-compose.yml -p fakegoprod up -d && \
+    docker ps -a
+}
+
+simprod_stop() {
+    docker-compose -f ./ops/docker-compose.yml -p fakegoprod stop
+}
+
+simprod_reset() {
+    docker-compose -f ./ops/docker-compose.yml -p fakegoprod down
+}
+
+simprod_logs() {
+    docker-compose -f ./ops/docker-compose.yml -p fakegoprod logs --follow
+}
+
 case "${1:-}" in
     setup)
         setup
@@ -170,6 +192,18 @@ case "${1:-}" in
     ;;
     front:test)
         frontend_test
+    ;;
+    simprod:start)
+        simprod_start
+    ;;
+    simprod:stop)
+        simprod_stop
+    ;;
+    simprod:reset)
+        simprod_reset
+    ;;
+    simprod:logs)
+        simprod_logs
     ;;
     *)
         display_usage

@@ -35,6 +35,8 @@ func main() {
 		web.InstallTaskRoutes(apiRoutes, taskRepo)
 	})
 
+	slog.Info("Setup done. Starting server.")
+
 	err = svr.Run(fmt.Sprintf("0.0.0.0:%d", cfg.Port))
 	if err != nil {
 		fatal(err, "Cannot start server at port %d", cfg.Port)

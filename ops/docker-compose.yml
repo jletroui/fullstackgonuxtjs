@@ -1,0 +1,23 @@
+# Services necessary for local dev
+
+services:
+  fake_go_postgres_svc:
+    container_name: fake_go_postgres_prod_ctnr
+    image: postgres:12-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secretprod
+    volumes:
+      - ./fake-prod-db-init:/docker-entrypoint-initdb.d
+
+  fake_go_app_svc:
+    depends_on:
+      - fake_go_postgres_svc
+    container_name: fake_go_app_ctnr
+    image: fullstackgonuxtjs
+    environment:
+      - ENV=production
+    ports:
+      - "8080:8080"
+    volumes:
+      - "$HOME/.ejson_keys:/opt/ejson/keys"
