@@ -1,0 +1,7 @@
+**/.nuxt
+**/.vscode
+**/.output
+**/node_modules
+**/*.test.ts
+**/vitest.config.mts
+**/eslint.config.mjs

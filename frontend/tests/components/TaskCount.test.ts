@@ -1,7 +1,6 @@
 import { vi, it, expect, describe } from 'vitest'
-import { renderSuspended } from '@nuxt/test-utils/runtime'
+import { renderSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
 import { TaskCount } from '#components'
-import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 
 const { useTaskCountQueryMock } = vi.hoisted(() => ({ useTaskCountQueryMock: vi.fn() }))
 mockNuxtImport('useTaskCountQuery', () => useTaskCountQueryMock)

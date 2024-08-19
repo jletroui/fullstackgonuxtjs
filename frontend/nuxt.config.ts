@@ -3,7 +3,6 @@ export default defineNuxtConfig({
   ssr: false,
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
-  modules: ['@nuxt/eslint', '@nuxt/test-utils/module'],
   typescript: {
     typeCheck: true
   },
@@ -15,6 +14,7 @@ export default defineNuxtConfig({
     }
   },
   $development: {
+    modules: ['@nuxt/eslint', '@nuxt/test-utils/module'],
     runtimeConfig: {
       public: {
         apiBaseUrl: 'http://localhost:8080/api'
@@ -22,6 +22,7 @@ export default defineNuxtConfig({
     }
   },
   $test: {
+    modules: ['@nuxt/eslint', '@nuxt/test-utils/module'],
     runtimeConfig: {
       public: {
         apiBaseUrl: '' // Allow access to mocked endpoint by Nitro server: https://nuxt.com/docs/getting-started/testing#registerendpoint
