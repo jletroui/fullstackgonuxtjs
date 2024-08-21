@@ -5,6 +5,12 @@
 		},
 		{
 			"path": "../../../../../Julien/src/github/jletroui/fullstackgonuxtjs/frontend"
+		},
+		{
+			"path": "frontend2"
+		},
+		{
+			"path": "backend"
 		}
 	],
 	"settings": {

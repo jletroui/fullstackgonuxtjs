@@ -1,6 +1,6 @@
 {
   "_port": 8080,
-  "_allowOrigins": ["http://localhost:3000"],
+  "_allowOrigins": ["http://localhost:3000", "http://localhost:5173"],
   "_postgresHost": "localhost",
   "_postgresWaitTimeoutMs": 0,
   "_postgresPort": 5432,
