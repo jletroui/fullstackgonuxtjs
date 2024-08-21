@@ -1,0 +1,11 @@
+# Services necessary for local dev
+
+services:
+  frontci_svc:
+    image: node:20
+    environment:
+      - NODE_ENV=development
+    working_dir: /app
+    volumes:
+      - ../../frontend/:/app
+    command: 'sh -c "npm ci && npm run lint && npm run typecheck && npm run test"'

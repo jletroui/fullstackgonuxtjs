@@ -1,0 +1,21 @@
+# Services necessary for local dev
+
+services:
+  gobackci_svc:
+    depends_on:
+      - gopostgresci_svc
+    image: golang:1.23-alpine3.20
+    environment:
+      - ENV=ci
+    working_dir: /app
+    volumes:
+      - ../../:/app
+    command: 'sh /app/ops/ci/backci.sh'
+
+  gopostgresci_svc:
+    image: postgres:12-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secret
+    volumes:
+      - ../db/db-init:/docker-entrypoint-initdb.d

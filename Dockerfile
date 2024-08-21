@@ -16,7 +16,7 @@ WORKDIR /app
 
 COPY ./backend /app/backend
 RUN cd /app/backend \
- && go get -d -v ./... \
+ && go get -v ./... \
  && go build -o backend .
 
 COPY ./config /app/config

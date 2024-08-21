@@ -26,6 +26,7 @@ display_usage() {
     echo -e "  simprod:stop                               stops simulated prod."
     echo -e "  simprod:reset                              stops simulated prod and delete containers and their data."
     echo -e "  simprod:logs                               display logs of simulated prod."
+    echo -e "  ci                                         run Continuous Integration."
 }
 
 setup() {
@@ -76,7 +77,7 @@ setup() {
     # golangci-lint
     if ! command -v golangci-lint --version &> /dev/null; then
         echo "[SETUP] golangci-lint not found. Installing."
-        curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.59.1
+        curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.60.2
     else
         echo "[SETUP] golangci-lint already installed, skipping."
     fi
@@ -153,6 +154,13 @@ simprod_logs() {
     docker-compose -f ./ops/docker-compose.yml -p fakegoprod logs --follow
 }
 
+ci() {
+    docker-compose --progress tty --file ./ops/ci/docker-compose.backci.yml --project-name fullstackgoci up --remove-orphans --force-recreate --abort-on-container-exit
+    docker-compose --progress tty --file ./ops/ci/docker-compose.backci.yml --project-name fullstackgoci down
+    docker-compose --progress tty --file ./ops/ci/docker-compose.frontci.yml --project-name fullstackgoci up --remove-orphans --force-recreate --abort-on-container-exit
+    docker-compose --progress tty --file ./ops/ci/docker-compose.frontci.yml --project-name fullstackgoci down
+}
+
 case "${1:-}" in
     setup)
         setup
@@ -204,6 +212,9 @@ case "${1:-}" in
     ;;
     simprod:logs)
         simprod_logs
+    ;;
+    ci)
+        ci
     ;;
     *)
         display_usage

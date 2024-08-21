@@ -14,10 +14,8 @@ Supports:
 - frontend linting
 - structured logging
 - frontend unit tests for the example data access layer, controller, and page
-
-TODO:
 - deployment (production simulated locally)
-- frontend and backend CI
+- frontend and backend CI (almost, frontend Vue composables tests are failing for a yet to discover reason)
 
 Not covered:
 - monitoring (other than logging)

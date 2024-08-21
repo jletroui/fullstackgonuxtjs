@@ -8,7 +8,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=secretprod
     volumes:
-      - ./fake-prod-db-init:/docker-entrypoint-initdb.d
+      - db/fake-prod-db-init:/docker-entrypoint-initdb.d
 
   fake_go_app_svc:
     depends_on:

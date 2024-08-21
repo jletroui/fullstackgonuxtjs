@@ -4,11 +4,11 @@ go 1.22.1
 
 require (
 	github.com/Shopify/ejson v1.5.2
+	github.com/gin-contrib/cors v1.7.2
 	github.com/gin-gonic/gin v1.10.0
 )
 
 require (
-	github.com/gin-contrib/cors v1.7.2 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 )
