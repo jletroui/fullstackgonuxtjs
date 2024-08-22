@@ -2,11 +2,13 @@ FROM node:20-alpine3.20 AS NODE_BUILD
 
 WORKDIR /app
 ENV NODE_ENV=production
+ENV FRONTEND_SRC=./frontend
+#ENV FRONTEND_SRC=./frontend2
 
-COPY ./frontend/package*.json /app/
+COPY ${FRONTEND_SRC}/package*.json /app/
 RUN npm ci
 
-COPY ./frontend /app
+COPY ${FRONTEND_SRC} /app
 RUN npm run build
 
 
@@ -23,6 +25,9 @@ COPY ./config /app/config
 
 
 FROM alpine:3.20
+
+ENV FRONTEND_OUTPUT=/app/.output/public
+#ENV FRONTEND_OUTPUT=/app/.output/public
 
 WORKDIR /app
 # Need to provide ENV=production or ENV=staging to execute
