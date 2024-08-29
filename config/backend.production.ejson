@@ -2,6 +2,10 @@
   "_public_key": "37fb52ff5f2de5d8cc845d862c21aa4124e54e184e287f144317006b06d7c07c",
 
   "_port": 8080,
+  "_domain": "localhost",
+  "_uiUrl": "http://localhost:8080",
+  "_superTokensUrl": "http://fake_go_supertokens_svc:3567",
+  "_superTokensAdmins": ["julien.letrouit@gmail.com"],
   "_allowOrigins": [],
   "_postgresWaitTimeoutMs": 10000,
   "_postgresHost": "fake_go_postgres_svc",

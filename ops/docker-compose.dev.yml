@@ -1,13 +1,39 @@
 # Services necessary for local dev
 
 services:
-  postgres_svc:
+  # Note: If you are assigning a custom name to your db service on the line below, make sure it does not contain underscores (important for supertokens config)
+  postgres-svc:
     container_name: go_postgres_ctnr
     image: postgres:12-alpine
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=secret
     ports:
-        - "5432:5432"
+      - 5432:5432 
     volumes:
       - ./db/db-init:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'postgres', '-d', 'supertokens']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # From: https://supertokens.com/docs/emailpassword/pre-built-ui/setup/core/with-docker#docker-compose-file
+  supertokens_svc:
+    container_name: go_supertokens_ctnr
+    image: registry.supertokens.io/supertokens/supertokens-postgresql:9.2.0
+    depends_on:
+      postgres-svc:
+        condition: service_healthy
+    ports:
+      - 3567:3567
+    environment:
+      POSTGRESQL_CONNECTION_URI: "postgresql://supertokens:supertokens@postgres-svc:5432/supertokens"
+    restart: unless-stopped
+    healthcheck:
+      test: >
+        bash -c 'exec 3<>/dev/tcp/127.0.0.1/3567 && echo -e "GET /hello HTTP/1.1\r\nhost: 127.0.0.1:3567\r\nConnection: close\r\n\r\n" >&3 && cat <&3 | grep "Hello"'
+      interval: 10s
+      timeout: 5s
+      retries: 5

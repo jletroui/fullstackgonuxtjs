@@ -10,6 +10,10 @@ import (
 
 type Config struct {
 	Port                  int      `json:"_port"`
+	Domain                string   `json:"_domain"`
+	UiUrl                 string   `json:"_uiUrl"`
+	SuperTokensUrl        string   `json:"_superTokensUrl"`
+	SuperTokensAdmins     []string `json:"_superTokensAdmins"`
 	AllowOrigins          []string `json:"_allowOrigins"`
 	PostgresWaitTimeoutMs int      `json:"_postgresWaitTimeoutMs"`
 	PostgresHost          string   `json:"_postgresHost"`
@@ -19,6 +23,10 @@ type Config struct {
 	PostgresAppUser       string   `json:"_postgresAppUser"`
 	PostgresAppPassword   string   `json:"postgresAppPassword"`
 	BasePath              string
+}
+
+func (c *Config) APIBasePath() string {
+	return fmt.Sprintf("http://%s:%d/", c.Domain, c.Port)
 }
 
 // When deployed, the config is encrypted

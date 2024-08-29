@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"testing"
+
+	"github.com/gin-gonic/gin"
 )
 
 var Cfg *config.Config
@@ -24,4 +26,30 @@ func TestMain(m *testing.M) {
 	}
 	fmt.Println("Loaded test config.")
 	m.Run()
+}
+
+type TestSessionVerifier struct {
+	failNextVerification bool
+	userID               string
+}
+
+func (tsv *TestSessionVerifier) VerifySession(c *gin.Context) {
+	if tsv.failNextVerification {
+		// Roughly simulate SuperTokens behaviour
+		c.AbortWithStatus(401)
+	} else {
+		c.Next()
+	}
+}
+
+func (tsv *TestSessionVerifier) GetUserID(c *gin.Context) string {
+	return tsv.userID
+}
+
+func (tsv *TestSessionVerifier) FailNextVerification() {
+	tsv.failNextVerification = true
+}
+
+func (tsv *TestSessionVerifier) SetUserID(userID string) {
+	tsv.userID = userID
 }

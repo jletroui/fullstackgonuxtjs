@@ -6,15 +6,41 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func InstallTaskRoutes(svr *gin.RouterGroup, taskRepo logic.TaskRepository) {
-	svr.GET("/tasks/count", func(ctx *gin.Context) {
-		count, err := taskRepo.Count()
-		if err != nil {
-			_ = ctx.AbortWithError(500, err)
-		}
+type NewTask struct {
+	Description string `json:"description" binding:"required"`
+}
 
-		ctx.JSON(200, gin.H{
-			"count": count,
-		})
+type tasksController struct {
+	taskRepo logic.TaskRepository
+}
+
+func InstallTaskRoutes(svr *gin.RouterGroup, sess SessionVerifier, taskRepo logic.TaskRepository) {
+	controller := &tasksController{taskRepo}
+	svr.GET("/tasks/count", controller.getTasksCount)
+	svr.POST("/tasks", sess.VerifySession, controller.postNewTask)
+}
+
+func (c *tasksController) getTasksCount(ctx *gin.Context) {
+	count, err := c.taskRepo.Count()
+	if err != nil {
+		_ = ctx.AbortWithError(500, err)
+	}
+
+	ctx.JSON(200, gin.H{
+		"count": count,
 	})
+}
+
+func (c *tasksController) postNewTask(ctx *gin.Context) {
+	var body NewTask
+	err := ctx.BindJSON(&body)
+	if err != nil {
+		return
+	}
+	err = c.taskRepo.CreateTask(body.Description)
+	if err != nil {
+		_ = ctx.AbortWithError(500, err)
+	}
+
+	ctx.String(200, "")
 }

@@ -10,19 +10,29 @@ display_usage() {
     echo -e ""
     echo -e "Available commands:"
     echo -e "  setup                                      install necessary environment for developing with this project on Debian."
-    echo -e "  db:start                                   starts the backend dev database."
-    echo -e "  db:stop                                    stops the backend dev database."
+    echo -e "  edit                                       launch vscode on this project."
+    echo -e "  deps:run                                   starts the backend dev database and other dev dependencies."
+    echo -e "  deps:stop                                  stops the backend dev database and the other dev dependencies."
+    echo -e "  deps:reset                                 erase the backend dev database and the other dev dependencies containers and their data."
     echo -e "  db:console                                 opens the backend dev database psql console."
     echo -e "  db:create-migration NAME                   creates a new migration script for the backend database with name NAME."
     echo -e "  back:run                                   runs backend server."
     echo -e "  back:check                                 runs backend lint and test."
     echo -e "  back:lint                                  runs backend lint."
     echo -e "  back:test                                  runs backend tests."
-    echo -e "  front:install                              install frontend dependencies."
-    echo -e "  front:run                                  starts frontend development server."
-    echo -e "  front:check                                runs frontend lint and test."
-    echo -e "  front:lint                                 runs frontend lint."
-    echo -e "  front:test                                 runs frontend tests."
+    echo -e "  back:gen-mocks                             let mockery generate test mocks for our interfaces."
+    echo -e "  front1:install                             install frontend 1 (Nuxt + Vue) dependencies."
+    echo -e "  front1:reinstall                           flush /node_modules et package-lock.json and install."
+    echo -e "  front1:run                                 starts frontend 1 (Nuxt + Vue) development server."
+    echo -e "  front1:check                               runs frontend 1 (Nuxt + Vue) lint and test."
+    echo -e "  front1:lint                                runs frontend 1 (Nuxt + Vue) lint."
+    echo -e "  front1:test                                runs frontend 1 (Nuxt + Vue) tests."
+    echo -e "  front2:install                             install frontend 2 (Vite + Preact) dependencies."
+    echo -e "  front2:reinstall                           flush /node_modules et package-lock.json and install."
+    echo -e "  front2:run                                 starts frontend 2 (Vite + Preact) development server."
+    echo -e "  front2:check                               runs frontend 2 (Vite + Preact) lint and test."
+    echo -e "  front2:lint                                runs frontend 2 (Vite + Preact) lint."
+    echo -e "  front2:test                                runs frontend 2 (Vite + Preact) tests."
     echo -e "  simprod:start                              simulate build and deployment in a production env, locally."
     echo -e "  simprod:stop                               stops simulated prod."
     echo -e "  simprod:reset                              stops simulated prod and delete containers and their data."
@@ -83,6 +93,21 @@ setup() {
         echo "[SETUP] golangci-lint already installed, skipping."
     fi
 
+    # VSCode
+    if ! command -v code --version &> /dev/null; then
+        echo "[SETUP] VSCode not found. Installing."
+        # https://code.visualstudio.com/docs/setup/linux
+        wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
+        sudo install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
+        echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/vscode.list > /dev/null
+        rm -f packages.microsoft.gpg
+        sudo apt install -y apt-transport-https
+        sudo apt update
+        sudo apt install -y code
+    else
+        echo "[SETUP] VSCode already installed, skipping."
+    fi
+
     # this hook is making sure we are not commiting unencrypted secrets
     mkdir -p ./.git/hooks
     cp ./ops/git/hooks/pre-commit ./.git/hooks/
@@ -95,13 +120,25 @@ setup() {
     echo 'PATH="$(go env GOPATH)/bin:$PATH"'
     echo ""
     echo '2) install Docker Desktop if not done. On Windows / WSL, use Chocolatey to do so. On pure Debian, use apt.'
+    echo ""
+    echo '3) create an admin user in SuperTokens:'
+    echo './dev deps:run'
+    echo "curl --location --request POST 'http://localhost:3567/recipe/dashboard/user' --header 'rid: dashboard' --header 'Content-Type: application/json' --data-raw '{\"email\": \"admin@fakemail.com\",\"password\": \"admin123\"}'"
 }
 
-db_start() {
+edit() {
+    code .
+}
+
+deps_run() {
     docker-compose -f ops/docker-compose.dev.yml up --detach --no-recreate --remove-orphans
 }
 
-db_stop() {
+deps_stop() {
+    docker-compose -f ops/docker-compose.dev.yml stop
+}
+
+deps_reset() {
     docker-compose -f ops/docker-compose.dev.yml down
 }
 
@@ -125,20 +162,48 @@ backend_test() {
     (cd backend && echo "Testing..." && go test -v ./...)
 }
 
-frontend_install() {
+backend_gen-mocks() {
+    (cd backend && docker run -v "$PWD":/src -w /src vektra/mockery --all)
+}
+
+frontend1_install() {
     (cd frontend && npm install)
 }
 
-frontend_run() {
+frontend1_reinstall() {
+    (cd frontend &&  rm -rf node_modules && rm package-lock.json && npm install)
+}
+
+frontend1_run() {
     (cd frontend && npm run dev)
 }
 
-frontend_lint() {
+frontend1_lint() {
     (cd frontend && echo "Linting..." && npm run lint && npm run typecheck)
 }
 
-frontend_test() {
-    (cd frontend && echo "Testing..." && npm run test)
+frontend1_test() {
+    (cd frontend2 && echo "Testing..." && npm run test)
+}
+
+frontend2_install() {
+    (cd frontend2 && npm install)
+}
+
+frontend2_reinstall() {
+    (cd frontend2 &&  rm -rf node_modules && rm package-lock.json && npm install)
+}
+
+frontend2_run() {
+    (cd frontend2 && npm run dev)
+}
+
+frontend2_lint() {
+    (cd frontend2 && echo "Linting..." && npm run lint && npm run typecheck)
+}
+
+frontend2_test() {
+    (cd frontend2 && echo "Testing..." && npm run test)
 }
 
 simprod_start() {
@@ -170,11 +235,17 @@ case "${1:-}" in
     setup)
         setup
     ;;
-    db:start)
-        db_start
+    edit)
+        edit
     ;;
-    db:stop)
-        db_stop
+    deps:run)
+        deps_run
+    ;;
+    deps:stop)
+        deps_stop
+    ;;
+    deps:reset)
+        deps_reset
     ;;
     db:console)
         db_console
@@ -194,21 +265,45 @@ case "${1:-}" in
     back:test)
         backend_test
     ;;
-    front:install)
-        frontend_install
+    back:gen-mocks)
+        backend_gen-mocks
     ;;
-    front:run)
-        frontend_run
+    front1:install)
+        frontend1_install
     ;;
-    front:check)
-        frontend_lint; frontend_test
+    front1:reinstall)
+        frontend1_reinstall
     ;;
-    front:lint)
-        frontend_lint
+    front1:run)
+        frontend1_run
     ;;
-    front:test)
-        frontend_test
+    front1:check)
+        frontend1_lint; frontend1_test
     ;;
+    front1:lint)
+        frontend1_lint
+    ;;
+    front1:test)
+        frontend1_test
+    ;;
+    front2:install)
+        frontend2_install
+    ;;
+    front2:reinstall)
+        frontend2_reinstall
+    ;;
+    front2:run)
+        frontend2_run
+    ;;
+    front2:check)
+        frontend2_lint; frontend2_test
+    ;;
+    front2:lint)
+        frontend2_lint
+    ;;
+    front2:test)
+        frontend2_test
+    ;;    
     simprod:start)
         simprod_start
     ;;

@@ -29,11 +29,20 @@ func main() {
 		fatal(err, "Cannot connect to database %s @%s", cfg.PostgresDatabase, cfg.PostgresHost)
 	}
 
-	taskRepo := logic.NewPostgresTaskRepository(db)
+	err = config.ConfigureSuperTokens(cfg)
+	if err != nil {
+		fatal(err, "Cannot initialize SuperTokens client")
+	}
 
-	svr := config.CreateWebServer(cfg, func(apiRoutes *gin.RouterGroup) {
-		web.InstallTaskRoutes(apiRoutes, taskRepo)
+	taskRepo := logic.NewPostgresTaskRepository(db)
+	sessionVerifier := web.NewSuperTokenSessionVerifier()
+
+	svr, err := config.CreateWebServer(cfg, func(apiRoutes *gin.RouterGroup) {
+		web.InstallTaskRoutes(apiRoutes, sessionVerifier, taskRepo)
 	})
+	if err != nil {
+		fatal(err, "Cannot initialize web server")
+	}
 
 	slog.Info("Setup done. Starting server.")
 

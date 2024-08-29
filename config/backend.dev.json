@@ -1,6 +1,10 @@
 {
   "_port": 8080,
-  "_allowOrigins": ["http://localhost:3000", "http://localhost:5173"],
+  "_domain": "localhost",
+  "_uiUrl": "http://localhost:5173",
+  "_superTokensUrl": "http://localhost:3567",
+  "_superTokensAdmins": ["julien.letrouit@gmail.com"],
+  "_allowOrigins": ["http://localhost:3000", "http://localhost:5173", "http://localhost:4173"],
   "_postgresHost": "localhost",
   "_postgresWaitTimeoutMs": 0,
   "_postgresPort": 5432,
