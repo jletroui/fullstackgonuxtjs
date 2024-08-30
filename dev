@@ -21,13 +21,13 @@ display_usage() {
     echo -e "  back:lint                                  runs backend lint."
     echo -e "  back:test                                  runs backend tests."
     echo -e "  back:gen-mocks                             let mockery generate test mocks for our interfaces."
-    echo -e "  front1:install                             install frontend 1 (Nuxt + Vue) dependencies."
+    echo -e "  front1:install [NPM OPTIONS]               install frontend 1 (Nuxt + Vue) dependencies."
     echo -e "  front1:reinstall                           flush /node_modules et package-lock.json and install."
     echo -e "  front1:run                                 starts frontend 1 (Nuxt + Vue) development server."
     echo -e "  front1:check                               runs frontend 1 (Nuxt + Vue) lint and test."
     echo -e "  front1:lint                                runs frontend 1 (Nuxt + Vue) lint."
     echo -e "  front1:test                                runs frontend 1 (Nuxt + Vue) tests."
-    echo -e "  front2:install                             install frontend 2 (Vite + Preact) dependencies."
+    echo -e "  front2:install [NPM OPTIONS]               install frontend 2 (Vite + Preact) dependencies."
     echo -e "  front2:reinstall                           flush /node_modules et package-lock.json and install."
     echo -e "  front2:run                                 starts frontend 2 (Vite + Preact) development server."
     echo -e "  front2:check                               runs frontend 2 (Vite + Preact) lint and test."
@@ -121,7 +121,7 @@ setup() {
     echo ""
     echo '2) install Docker Desktop if not done. On Windows / WSL, use Chocolatey to do so. On pure Debian, use apt.'
     echo ""
-    echo '3) create an admin user in SuperTokens:'
+    echo '3) create an admin user in SuperTokens: [TODO: automate]'
     echo './dev deps:run'
     echo "curl --location --request POST 'http://localhost:3567/recipe/dashboard/user' --header 'rid: dashboard' --header 'Content-Type: application/json' --data-raw '{\"email\": \"admin@fakemail.com\",\"password\": \"admin123\"}'"
 }
@@ -167,7 +167,7 @@ backend_gen-mocks() {
 }
 
 frontend1_install() {
-    (cd frontend && npm install)
+    (cd frontend && npm install "$@")
 }
 
 frontend1_reinstall() {
@@ -187,7 +187,7 @@ frontend1_test() {
 }
 
 frontend2_install() {
-    (cd frontend2 && npm install)
+    (cd frontend2 && npm install "$@")
 }
 
 frontend2_reinstall() {
@@ -269,7 +269,8 @@ case "${1:-}" in
         backend_gen-mocks
     ;;
     front1:install)
-        frontend1_install
+        shift
+        frontend1_install "$@"
     ;;
     front1:reinstall)
         frontend1_reinstall
@@ -287,7 +288,8 @@ case "${1:-}" in
         frontend1_test
     ;;
     front2:install)
-        frontend2_install
+        shift
+        frontend2_install "$@"
     ;;
     front2:reinstall)
         frontend2_reinstall

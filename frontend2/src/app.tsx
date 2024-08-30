@@ -3,8 +3,7 @@ import EmailPassword from "supertokens-auth-react/recipe/emailpassword";
 import Session from "supertokens-auth-react/recipe/session";
 import { canHandleRoute, getRoutingComponent } from "supertokens-auth-react/ui";
 import { EmailPasswordPreBuiltUI } from 'supertokens-auth-react/recipe/emailpassword/prebuiltui';
-import TaskCount from './components/tasks/taskcount'
-import TaskCount2 from './components/tasks/taskcount2'
+import { lazy, LocationProvider, Router, Route } from 'preact-iso';
 
 SuperTokens.init({
     appInfo: {
@@ -21,6 +20,10 @@ SuperTokens.init({
     ]
 });
 
+const LandingPage = lazy(() => import('./pages/landing'));
+const HomePage = lazy(() => import('./pages/home'));
+const NotFoundPage = lazy(() => import('./pages/404'));
+
 export function App() {
   if (canHandleRoute([EmailPasswordPreBuiltUI])) {
     // This renders the login UI on the /auth route
@@ -28,13 +31,14 @@ export function App() {
   }
 
   return (
-    <SuperTokensWrapper>
-      <main>
-        <h1>Hello, Preact!</h1>
-        <h2>Task count: <TaskCount/></h2>
-        <h2>Task count 2.1: <TaskCount2/></h2>
-        <h2>Task count 2.2: <TaskCount2/></h2>
-      </main>
-    </SuperTokensWrapper>
+    <LocationProvider>
+      <SuperTokensWrapper>
+        <Router>
+          <Route path="/" component={LandingPage} />
+          <Route path="/home" component={HomePage } />
+          <Route default component={NotFoundPage}/>
+        </Router>
+      </SuperTokensWrapper>
+    </LocationProvider>
   )
 }
